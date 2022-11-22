@@ -1,31 +1,3 @@
-# FROM python:3.11.0-slim-bulleye AS compile-image
-# ARG ENVIRONMENT=development
-
-## update alpine and install build deps 
-# RUN set -x \
-#     apk update \
-#     && apk add --no-cache \
-#         gcc \
-#         libc-dev \
-#         linux-headers \
-#         zlib-dev \
-#         gtk+3.0-dev \
-#         # libjpeg  \
-#         musl-dev \
-#         mariadb-connector-c-dev \
-#         py3-pip \
-#         musl-dev \
-#         python3-dev \
-#         pango-dev \
-#         zlib-dev \
-#         jpeg-dev \
-#         openjpeg-dev \
-#         g++ \
-#         libffi-dev
-#         #mariadb-dev
-#         #mariadb-client
-#         #postgresql-dev
-
 FROM python:3.11.0-slim-bullseye AS runtime-image
 #ARG ENVIRONMENT=development
 ARG DEBIAN_FRONTEND=noninteractive
