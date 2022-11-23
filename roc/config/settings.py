@@ -92,8 +92,8 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'db_vacancies'),
         'USER': os.getenv('DB_USER', 'vacancies_user'),
         'PASSWORD': os.getenv('DB_PASS', 'vacancies_pass'),
-        # 'HOST': os.getenv('DB_HOST', 'db'),
-        # 'PORT': os.getenv('DB_PORT', 3306),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', 3306),
         'OPTIONS': {
             'init_command': "SET default_storage_engine=INNODB; SET sql_mode='STRICT_TRANS_TABLES'",
             'isolation_level': 'read committed',
