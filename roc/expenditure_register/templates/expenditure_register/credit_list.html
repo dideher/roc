@@ -54,7 +54,7 @@
                     {% comment %} <td> {{ credit.account }} </td> {% endcomment %}
                     <td> {{ forloop.counter }} </td>
                     <td> {{ credit.credit_reform }} </td>
-                    <td> {{ credit.credit }} </td>
+                    <td> {{ credit.credit |floatformat:2 }} </td>
                     <td> {{ credit.disposed_percentage }} </td>
                     <td> {{ credit.date_of_disposal }} </td>
                     <td style="text-align: center"> 
