@@ -6,7 +6,11 @@ from .models import *
 from decimal import *
 
 
-def compute_total_credit(account_pk, reference_date = datetime.datetime.today())->Decimal:
+def compute_total_credit(account_pk, reference_date=None)->Decimal:
+    
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
 
     account_credits = Credit.objects.filter(account=account).filter(date_of_disposal__lte = reference_date)
@@ -15,7 +19,10 @@ def compute_total_credit(account_pk, reference_date = datetime.datetime.today())
     return  total_credit
 
 
-def compute_initial_credit(account_pk, reference_date = datetime.datetime.today()):
+def compute_initial_credit(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_initial_credit = Decimal(0.0)
 
@@ -32,7 +39,10 @@ def compute_initial_credit(account_pk, reference_date = datetime.datetime.today(
     return  account_initial_credit
 
 
-def compute_reformed_credit(account_pk, reference_date = datetime.datetime.today()):
+def compute_reformed_credit(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_initial_credit = Decimal(0.0)
     try:
@@ -50,7 +60,10 @@ def compute_reformed_credit(account_pk, reference_date = datetime.datetime.today
     return  account_initial_credit
 
 
-def compute_disposed_percentage(account_pk, reference_date = datetime.datetime.today()):
+def compute_disposed_percentage(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     undiscounted_credit = Credit.objects.filter(account=account).filter(date_of_disposal__lte = reference_date).aggregate(Sum('credit'))['credit__sum']
     if undiscounted_credit is None:
@@ -69,7 +82,10 @@ def compute_disposed_percentage(account_pk, reference_date = datetime.datetime.t
     return  disposed_percentage
 
 
-def compute_total_debit(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_debit(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     total_debit = Debit.objects.filter(account=account).filter(debit_date__lte = reference_date).aggregate(Sum('debit'))['debit__sum']
     if total_debit is None:
@@ -77,7 +93,10 @@ def compute_total_debit(account_pk, reference_date = datetime.datetime.today()):
     return  total_debit
 
 
-def compute_total_recall(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_recall(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     amount_to_recall = Recall.objects.filter(account=account).filter(recall_date__lte = reference_date).aggregate(Sum('recall'))['recall__sum']
     if amount_to_recall is None:
@@ -85,7 +104,10 @@ def compute_total_recall(account_pk, reference_date = datetime.datetime.today())
     return amount_to_recall
 
 
-def compute_total_invoice_amount(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_invoice_amount(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(account = account).filter(debit_date__lte = reference_date)
     account_invoices__total_amount = RequestForPaymentOrInvoice.objects.filter(debit__in = list(account_debits)).filter(invoice_date__lte = reference_date).aggregate(Sum('invoice_charge_amount'))['invoice_charge_amount__sum']
@@ -99,7 +121,10 @@ def compute_total_invoice_amount(account_pk, reference_date = datetime.datetime.
     return account_invoices__total_amount - account_invoices_with_canceled_payments__total_amount
 
 
-def compute_total_prepaid_invoice_amount(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_prepaid_invoice_amount(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(account=account).filter(debit_date__lte = reference_date)
     #invoice_list = [i.invoice_charge_amount for d in account_debits for i in list(RequestForPaymentOrInvoice.objects.filter(debit = d.pk))]
@@ -153,7 +178,10 @@ def compute_total_invoice_amount_owned_to_creditors_from_abroad(account_pk, owne
     return  invoice_amount_owned_to_entity - payment_amount_owned_to_entity 
 
 
-def compute_total_invoice_amount_charged_on_debit(account_pk, debit_pk, reference_date = datetime.datetime.today()):
+def compute_total_invoice_amount_charged_on_debit(account_pk, debit_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(pk=debit_pk).filter(debit_date__lte = reference_date)
     invoice_queryset = RequestForPaymentOrInvoice.objects.filter(debit__in = list(account_debits)).filter(invoice_date__lte = reference_date)
@@ -167,7 +195,10 @@ def compute_total_invoice_amount_charged_on_debit(account_pk, debit_pk, referenc
     return  total_invoice
 
 
-def compute_total_payment_amount(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_payment_amount(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(account=account).filter(debit_date__lte = reference_date)
     #invoice_list = [i.invoice_charge_amount for d in account_debits for i in list(RequestForPaymentOrInvoice.objects.filter(debit = d.pk))]
@@ -178,7 +209,10 @@ def compute_total_payment_amount(account_pk, reference_date = datetime.datetime.
     return  payments__non_canceled #payments
 
 
-def compute_total_90days_delayed_payment_to_third_parties_list(account_pk, reference_date = datetime.datetime.today()):
+def compute_total_90days_delayed_payment_to_third_parties_list(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(account=account).filter(debit_date__lte = reference_date)
     #invoice_list = [i.invoice_charge_amount for d in account_debits for i in list(RequestForPaymentOrInvoice.objects.filter(debit = d.pk))]
@@ -190,7 +224,10 @@ def compute_total_90days_delayed_payment_to_third_parties_list(account_pk, refer
     return  delayed_payments_to_third_parties__non_canceled #payments
 
 
-def compute_90days_delayed_setoff_payment_to_third_parties_list(account_pk, reference_date = datetime.datetime.today()):
+def compute_90days_delayed_setoff_payment_to_third_parties_list(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     account = Account.objects.get(pk = account_pk)
     account_debits = Debit.objects.filter(account=account).filter(debit_date__lte = reference_date)
     #invoice_list = [i.invoice_charge_amount for d in account_debits for i in list(RequestForPaymentOrInvoice.objects.filter(debit = d.pk))]
@@ -202,7 +239,10 @@ def compute_90days_delayed_setoff_payment_to_third_parties_list(account_pk, refe
     return  delayed_setoff_payments_to_third_parties__non_canceled #payments
 
 
-def compute_report_data(register_pk, reference_date = datetime.datetime.today()):
+def compute_report_data(register_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
     accounts = Account.objects.filter(expenditure_register = register_pk)
     # balance_list = [get_account_balance(account.pk) for account in accounts]
     initial_credit_list = [compute_initial_credit(account.pk, reference_date) for account in accounts]
