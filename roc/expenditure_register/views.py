@@ -337,7 +337,6 @@ class AccountListView(LoginRequiredMixin, ListView):
         total_payment_list = [compute_total_payment_amount(account.pk) for account in context['object_list']]
         total_pending_debits = [d - p for d, p in zip(total_debit_list, total_payment_list)]
         total_pending_payments = [i - p for i, p in zip(total_invoice_list, total_payment_list)]
-
         context['data_list'] = zip(list(context['object_list']), total_credit_list, total_debit_list, total_residual_credit_list, total_recall_list, total_invoice_list, total_amount_to_recall, total_payment_list, total_pending_debits, total_pending_payments)
         context['register'] = ExpenditureRegister.objects.get(pk = self.kwargs['register_pk'])
         context['account_selection'] = [account_category[0] for account_category in account_CATEGORIES_TYPE_CHOICES]
