@@ -19,7 +19,7 @@
         <tbody>
             {% for registry in object_list %}
                 <tr>
-                    <td> {{ registry.year }} </td>
+                    <td> {{ registry.year |stringformat:"i" }} </td>
                     <td> {{ registry.budget_type }} </td>
                     <td> {{ registry.organization }} </td>
                     <td> {{ registry.special_organization }} </td> 
