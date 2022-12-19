@@ -326,7 +326,6 @@ class AccountListView(LoginRequiredMixin, ListView):
 
     # Add to context the data of the Expediture Register so that the user can see the register book it works on.
     def get_context_data(self, **kwargs):
-        print(f'{test}')
         context = super().get_context_data(**kwargs)
         # balance_list = [get_account_balance(account.pk) for account in context['object_list']]
         total_credit_list = [compute_total_credit(account.pk) for account in context['object_list']]
