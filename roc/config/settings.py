@@ -21,7 +21,7 @@ dc.prec = 20
 
 
 sentry_sdk.init(
-    dsn="https://c7c8ba9e015e4a6db0e15211136037f0@o4504355371548672.ingest.sentry.io/4504355383934976",
+    dsn= os.getenv('SECRET_KEY'),
     integrations=[
         DjangoIntegration(),
     ],
