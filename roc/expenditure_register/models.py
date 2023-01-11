@@ -52,7 +52,7 @@ account_CATEGORIES_TYPE_CHOICES = [
 
 
 class Account(models.Model):
-    number = models.IntegerField(verbose_name = _("ΑΛΕ"))
+    number = models.CharField(max_length = 100, verbose_name = _("ΑΛΕ"))
     # balance = models.DecimalField(max_digits=10, decimal_places=2, default= 0.00, verbose_name= _('Διαθέσιμο Υπόλοιπο (€)'))
     category = models.CharField(max_length = 50, default='ΑΓΟΡΕΣ ΑΓΑΘΩΝ ΚΑΙ ΥΠΗΡΕΣΙΩΝ', verbose_name= _('Κατηγορία'))
     subcategory = models.CharField(max_length = 100,  choices=account_CATEGORIES_TYPE_CHOICES, verbose_name= _('Υποκατηγορία'))
