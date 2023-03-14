@@ -49,8 +49,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*','192.168.2.79']
-CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net', 'http://192.168.2.79:8000']# Application definition
+ALLOWED_HOSTS = ['*','192.168.2.132']
+CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net', 'http://192.168.2.132:8000']# Application definition
 
 INSTALLED_APPS = [
     'expenditure_register.apps.ExpenditureRegisterConfig',
