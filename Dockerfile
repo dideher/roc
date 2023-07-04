@@ -6,6 +6,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ## update Debian and install runtime deps
 RUN apt-get update -y &&\
+    apt-get install pkg-config -y &&\
     apt-get install default-libmysqlclient-dev -y  &&\
     apt-get install build-essential -y &&\
     apt-get install nginx -y &&\
