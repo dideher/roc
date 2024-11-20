@@ -1,19 +1,21 @@
 services:
   db:
-    image: mysql:8.0
+    image: mariadb
     restart: "no" 
     #command: "--default-authentication-plugin=mysql_native_password"
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/var/lib/mariadb
     env_file:
       - .env
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: db_roc
-      MYSQL_USER: roc_user
-      MYSQL_PASSWORD: roc_pass
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DB_NAME}
+      MARIADB_USER: ${MARIADB_USER} 
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    ports:
+      - "3306:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      test: ["CMD", "mariadb-admin" ,"ping", "-h", "localhost", "-u$$MARIADB_USER", "-p$$MARIADB_PASSWORD"]
       interval: 5s
       timeout: 5s
       retries: 2
@@ -21,7 +23,9 @@ services:
       - back-tier
 
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     restart: "no" 
     environment:
       ENVIRONMENT: dev

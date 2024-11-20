@@ -10,51 +10,66 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
+from environs import Env
 from pathlib import Path
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 import decimal
-
 dc = decimal.DefaultContext
 dc.prec = 20
 # print(dc)
 
+# --- gstam ---
+env = Env()
+env.read_env("../.env", recurse=False)
+SECRET_KEY = env('SECRET_KEY')
+DEVELOPMENT = env('DEVELOPMENT')
 
 sentry_sdk.init(
-    dsn= os.getenv('SDN_URL'),
-    integrations=[
-        DjangoIntegration(),
-    ],
-
+    dsn= env('DSN'),
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production.
-    traces_sample_rate=1.0,
-
-    # If you wish to associate users to errors (assuming you are using
-    # django.contrib.auth) you may enable sending PII data.
-    send_default_pii=True
+    traces_sample_rate=.1,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=0.1,
+    environment="development",
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+if DEVELOPMENT:
+    DEBUG = True
+    ALLOWED_HOSTS = ['*']
+    CSRF_TRUSTED_ORIGINS = ['http://192.168.2.217:8000', 'http://139.91.68.114:8000']
+else:
+    DEBUG = False
+    # SECURITY WARNING: don't run with debug turned on in production!
+    ALLOWED_HOSTS = ['roc.dide.ira.net']
+    # CSRF_COOKIE_SECURE = False
+    CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net']
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+# Database
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('MARIADB_DATABASE'), 
+        'USER': env('MARIADB_USER'),
+        'PASSWORD': env('MARIADB_PASSWORD'),
+        'HOST': env('MARIADB_HOST_IP'),
+        'PORT': env('MARIADB_PORT'),
+        }
+    }
+# *** gstam *** END
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['*','192.168.2.132']
-CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net', 'http://192.168.2.132:8000']# Application definition
 
 INSTALLED_APPS = [
     'expenditure_register.apps.ExpenditureRegisterConfig',
-    'bootstrap5',
+    'crispy_forms',
+    'crispy_bootstrap5',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -95,31 +110,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('DB_NAME', 'db_vacancies'),
-        'USER': os.getenv('DB_USER', 'vacancies_user'),
-        'PASSWORD': os.getenv('DB_PASS', 'vacancies_pass'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', 3306),
-        'OPTIONS': {
-            'init_command': "SET default_storage_engine=INNODB; SET sql_mode='STRICT_TRANS_TABLES'",
-            'isolation_level': 'read committed',
-        }
-    }
-}
-
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -138,8 +128,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# django-crispy-forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+
 LOGIN_REDIRECT_URL = '/expenditure_register/register/list'
-LOGOUT_REDIRECT_URL = '/accounts/login'
+LOGOUT_REDIRECT_URL = '/expenditure_register/' #/accounts/login'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

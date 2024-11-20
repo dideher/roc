@@ -1,0 +1,17 @@
+export DEVELOPMENT=True
+export DSN="https://c7c8ba9e015e4a6db0e15211136037f0@o4504355371548672.ingest.sentry.io/4504355383934976"
+export SECRET_KEY="s6=xdstdpdmmm#k6jkf3n*li-3sfsa34242342fsafsdfwb%bzu*hv01ik*bh_ooz^if("
+export MARIADB_DATABASE=roc_db
+export MARIADB_ROOT_PASSWORD=root_password
+export MARIADB_DB_NAME=roc_db
+export MARIADB_USER=roc_user
+export MARIADB_PASSWORD=roc_user_password
+export MARIADB_HOST=db
+export MARIADB_HOST_IP='192.168.2.217'
+export MARIADB_PORT=3306
+export DEFAULT_FROM_EMAIL="plinetir4@sch.gr" # don't give this out!
+export EMAIL_HOST="mail.sch.gr"
+export EMAIL_HOST_USER="plinetir4" #don't give this out!
+export EMAIL_HOST_PASSWORD="teplinet4" #don't give this out!
+export EMAIL_PORT="587"
+export EMAIL_USE_TLS="True"

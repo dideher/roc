@@ -1,6 +1,7 @@
 roc/config/__pycache__
 roc/static_files/
 .vscode/
+*.sql
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

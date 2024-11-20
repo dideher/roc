@@ -1,5 +1,6 @@
 <!-- templates/teacher_new.html -->
 {% extends 'expenditure_register/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}    
 <br>
@@ -10,7 +11,7 @@
             <tr>
                 <th scope="col"> Οικονομικό έτος </th>
                 <th scope="col"> Τύπος προϋπολογισμού </th>                
-                <th scope="col"> Φορέας </th>      
+                <th scope="col"> Φορέας </th>
                 <th scope="col"> Ειδικός Φορέας </th>
                 <th scope="col" style="text-align: center"> ΑΛΕ</th> 
                 <th scope="col" style="text-align: center"> Λειτουργίες Μητρώου</th> 

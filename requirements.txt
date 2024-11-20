@@ -1,6 +1,7 @@
-config==0.5.1
-Django==4.0.5
-openpyxl==3.0.10
-django-bootstrap-v5==1.0.11
-weasyprint==57.1
-sentry_sdk==1.12.1
+Django
+environs
+openpyxl
+django-crispy-forms
+crispy-bootstrap5
+weasyprint
+sentry_sdk[django]
