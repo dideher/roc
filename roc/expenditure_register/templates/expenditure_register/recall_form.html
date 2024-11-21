@@ -1,12 +1,12 @@
 {% extends 'expenditure_register/base.html' %}
-{% load bootstrap5 %}
+{% load crispy_forms_tags %}
 
 {% block content %}
     <h1>Καταχώρηση Ανάκλησης</h1>
     <form method="post">
         {% csrf_token %}
-        {% bootstrap_form form %}        
+        {{  form | crispy }}        
         <a href="{% url 'recall_list' register.pk account.pk %}" class="btn btn-secondary"> Ακύρωση </a>
-        <input type="submit" value="Αποθήκευση" class="bth btn-primary">
+        <input type="submit" value="Αποθήκευση" class="btn btn-primary">
     </form>
 {% endblock content %}

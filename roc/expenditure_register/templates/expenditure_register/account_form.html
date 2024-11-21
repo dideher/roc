@@ -1,12 +1,12 @@
 {% extends 'expenditure_register/base.html' %}
-{% load bootstrap5 %}
+{% load crispy_forms_tags %}
 
 {% block content %}
     <h1>Στοιχεία ΑΛΕ</h1>
     <form method="post">
         {% csrf_token %}
-        {% bootstrap_form form %}        
+        {{ form | crispy }}        
         <a href="{% url 'account_list' register.pk %}" class="btn btn-secondary"> Ακύρωση </a>
-        <input type="submit" value="Αποθήκευση" class="bth btn-primary btn-md">
+        <input type="submit" value="Αποθήκευση" class="btn btn-primary btn-md">
     </form>
 {% endblock content %}
