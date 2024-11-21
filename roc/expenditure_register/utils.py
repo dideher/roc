@@ -50,7 +50,7 @@ def compute_reformed_credit(account_pk, reference_date=None):
     except (MultipleObjectsReturned, ObjectDoesNotExist):
         pass
 
-    print(reference_date, account_initial_credit)
+    # print(reference_date, account_initial_credit)
     if account_initial_credit is None:
         account_initial_credit = Decimal(0.0)
     else:
@@ -248,7 +248,7 @@ def compute_report_data(register_pk, reference_date=None):
     initial_credit_list = [compute_initial_credit(account.pk, reference_date) for account in accounts]
     # print(type(initial_credit_list[0]))
     reformed_credit_list = [compute_reformed_credit(account.pk, reference_date) for account in accounts]
-    print(reformed_credit_list)
+    # print(reformed_credit_list)
     # print(type(reformed_credit_list[0]))
     total_credit_list = [i_c + r_c for i_c, r_c in zip(initial_credit_list, reformed_credit_list)]
     disposed_percentage_list = [compute_disposed_percentage(account.pk, reference_date) for account in accounts]

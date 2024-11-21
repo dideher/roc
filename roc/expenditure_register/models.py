@@ -90,6 +90,21 @@ class Debit(models.Model):
         return self.debit_protocol_number
 
 
+class Transfer(models.Model):
+    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name = _('Ποσό Μεταφοράς'))
+    protocol = models.CharField(max_length = 10, verbose_name= _('Αριθμός Πρωτοκόλλου'))
+    date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Μεταφοράς'))
+    diavgeia_string = models.CharField(max_length = 100, verbose_name= _('ΑΔΑ'))
+    diavgeia_date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Ανάρτησης στη Διαύγεια'))
+    outgoing_account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('Μεταφορά από ΑΛΕ'))
+    incoming_account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('Μεταφορά σε ΑΛΕ'))
+    
+
+    def __str__(self):
+        return self.protocol
+
+
+
 class Recall(models.Model):
     recall = models.DecimalField(max_digits=20, decimal_places=2, verbose_name = _('Ποσό Ανάκλησης'))
     recall_protocol_number = models.CharField(max_length = 10, verbose_name= _('Αριθμός πρωτ. απόφασης ανάκλησης δέσμευσης'))
