@@ -39,4 +39,8 @@ urlpatterns = [
     path('payment/<int:register_pk>/<int:account_pk>/<int:debit_pk>/<int:invoice_pk>/<int:pk>/detail', PaymentDetailView.as_view(), name = 'payment_detail'),
     path('payment/<int:register_pk>/<int:account_pk>/<int:debit_pk>/<int:invoice_pk>/<int:pk>/update', PaymentUpdateView.as_view(), name = 'payment_update'),
     path('payment/<int:register_pk>/<int:account_pk>/<int:debit_pk>/<int:invoice_pk>/<int:pk>/delete', PaymentDeleteView.as_view(), name = 'payment_delete'),
+    path('transfer/<int:register_pk>/create', TransferCreateView.as_view(), name = 'transfer_create'),
+    path('transfer/<int:register_pk>/list', TransferListView.as_view(), name = 'transfer_list'),
+    path('transfer/<int:register_pk>/<int:pk>/delete', TransferDeleteView.as_view(), name = 'transfer_delete'),
+
 ]

@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from django.db.models import Avg, Count, Min, Sum
 from django.core.exceptions import *
 from django.shortcuts import redirect
-from .models import *
+from expenditure_register.models import *
 from decimal import *
 
 
@@ -10,7 +10,6 @@ def compute_total_credit(account_pk, reference_date=None)->Decimal:
     
     if reference_date == None:
         reference_date = datetime.datetime.today()
-
     account = Account.objects.get(pk = account_pk)
 
     account_credits = Credit.objects.filter(account=account).filter(date_of_disposal__lte = reference_date)
@@ -56,7 +55,7 @@ def compute_reformed_credit(account_pk, reference_date=None):
     else:
         account_initial_credit = Decimal(account_initial_credit)
     
-    print(account_initial_credit)
+    # print(account_initial_credit)
     return  account_initial_credit
 
 

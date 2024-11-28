@@ -1,0 +1,12 @@
+{% extends 'expenditure_register/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h1>Είστε βέβαιοι ότι θέλετε να διαγράψετε την μεταφορά πίστωσης: {{ object }} </h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form | crispy }}        
+        <a href="{% url 'transfer_list' register_pk %}" class="btn btn-secondary"> Ακύρωση </a>
+        <input type="submit" value="Επιβεβαίωση" class="btn btn-danger btn-md">
+    </form>
+{% endblock content %}

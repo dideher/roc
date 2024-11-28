@@ -1,5 +1,6 @@
 <!-- templates/teacher_new.html -->
 {% extends 'expenditure_register/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}    
 
@@ -122,7 +123,7 @@ function create_chart(chart_name, data, myTitle) {
 }
 </script> 
 
-</fieldset>
+<fieldset>
 <form  action="{% url 'account_list' register.pk %}" method="GET">
     <div class="form-group row mt-2">
     {% comment %} <label for="account_selection" style="text-align: center"> Επιλογή Λογαριασμού (ΑΛΕ) </label> {% endcomment %}
@@ -137,6 +138,16 @@ function create_chart(chart_name, data, myTitle) {
     <button type="submit" name="submit" class="btn btn-primary  mt-2"> Προβολή </button>
 </form>
 </fieldset>
+
+{% comment %} <fieldset>
+    <form class="form-container" method="post" action="{% url 'account_list' register.pk %}">
+        <div class="card-body">
+            {% csrf_token %}
+            {{  form | crispy }}
+            <input type="submit" class="btn btn-success btn-md"  value="Μεταφορά" />
+        </div>
+    </form>
+</fieldset> {% endcomment %}
 
 <fieldset > 
     <legend style="text-align: center"> Λογαριασμοί Εξόδου (ΑΛΕ) </legend> 

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
@@ -62,12 +62,29 @@ class Account(models.Model):
     expenditure_register = models.ForeignKey(ExpenditureRegister, on_delete=models.CASCADE, verbose_name = _('Μητρώο Δεσμεύσεων'))
 
     def __str__(self):
-        return str(self.number)
+        return self.description + " (" + str(self.number) + ")"
+
+
+class Transfer(models.Model):
+    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name = _('Ποσό Μεταφοράς'))
+    protocol = models.CharField(max_length = 10, verbose_name= _('Αριθμός Πρωτοκόλλου'))
+    date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Μεταφοράς'))
+    diavgeia_string = models.CharField(max_length = 100, blank=True, null=True, verbose_name= _('ΑΔΑ'))
+    diavgeia_date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Ανάρτησης στη Διαύγεια'))
+    outgoing_account = models.ForeignKey(Account, on_delete=models.PROTECT, related_name="outgoing_accout", verbose_name = _('Μεταφορά από ΑΛΕ'))
+    incoming_account = models.ForeignKey(Account, on_delete=models.PROTECT, related_name="incoming_accout", verbose_name = _('Μεταφορά σε ΑΛΕ'))
+    expenditure_register = models.ForeignKey(ExpenditureRegister, on_delete=models.PROTECT, verbose_name = _('Μητρώο Δεσμεύσεων'))
+
+    def __str__(self):
+        return self.protocol
 
 CREDIT_AUTHORIZATION_TYPE_CHOICES = [
     ('ΕΓΚΕΚΡΙΜΕΝΗ','ΕΓΚΕΚΡΙΜΕΝΗ'),
     ('ΑΝΑΜΟΡΦΩΣΗ','ΑΝΑΜΟΡΦΩΣΗ'),
+    ('ΜΕΤΑΦΟΡΑ ΣΕ ΑΛΛΟ ΑΛΕ','ΜΕΤΑΦΟΡΑ ΣΕ ΑΛΛΟ ΑΛΕ'),
+    ('ΑΠΟ ΜΕΤΑΦΟΡΑ','ΑΠΟ ΜΕΤΑΦΟΡΑ'),
     ]
+
 
 # todo: dont allow the deletion of Credits unless the balance covers the sum of debits.
 class Credit(models.Model):
@@ -76,7 +93,8 @@ class Credit(models.Model):
     disposed_percentage =  models.DecimalField(max_digits=5, decimal_places=2, verbose_name = _('Ποσοστό Διάθεσης'))
     date_of_disposal = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Πίστωσης'))
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('ΑΛΕ'))
-    
+    transfer = models.ForeignKey(Transfer, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_('Μεταφορά'))
+   
     
 class Debit(models.Model):
     debit = models.DecimalField(max_digits=20, decimal_places=2, verbose_name = _('Ποσό Δέσμευσης'))
@@ -85,23 +103,10 @@ class Debit(models.Model):
     diavgeia_string = models.CharField(max_length = 100, verbose_name= _('ΑΔΑ'))
     diavgeia_date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Ανάρτησης στη Διαύγεια'))
     account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('ΑΛΕ'))
-
-    def __str__(self):
-        return self.debit_protocol_number
-
-
-class Transfer(models.Model):
-    amount = models.DecimalField(max_digits=20, decimal_places=2, verbose_name = _('Ποσό Μεταφοράς'))
-    protocol = models.CharField(max_length = 10, verbose_name= _('Αριθμός Πρωτοκόλλου'))
-    date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Μεταφοράς'))
-    diavgeia_string = models.CharField(max_length = 100, verbose_name= _('ΑΔΑ'))
-    diavgeia_date = models.DateField(default = timezone.now, verbose_name = _('Ημερομηνία Ανάρτησης στη Διαύγεια'))
-    outgoing_account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('Μεταφορά από ΑΛΕ'))
-    incoming_account = models.ForeignKey(Account, on_delete=models.CASCADE, verbose_name = _('Μεταφορά σε ΑΛΕ'))
     
 
     def __str__(self):
-        return self.protocol
+        return self.debit_protocol_number
 
 
 

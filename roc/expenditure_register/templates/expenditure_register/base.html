@@ -24,24 +24,53 @@
           {% if user.is_authenticated %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto">
-                <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" 
-                    href="#" 
-                    id="navbarDropdown" 
-                    role="button" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false">
-                    Λειτουργίες
-                    </a>
-                  <ul class="dropdown-menu" 
-                      aria-labelledby="navbarDropdown">
-                      <li>
-                        <a class="dropdown-item" 
-                        href="{% url 'register_create' %}">
-                        Νέο Μητρώο
-                        </a>
-                      </li>
-                  </ul>
+                {% if show_register_menu %}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" 
+                      href="#" 
+                      id="navbarDropdown" 
+                      role="button" 
+                      data-bs-toggle="dropdown" 
+                      aria-expanded="false">
+                      Μητρώα
+                      </a>
+                    <ul class="dropdown-menu" 
+                        aria-labelledby="navbarDropdown">
+                        <li>
+                          <a class="dropdown-item" 
+                          href="{% url 'register_create' %}">
+                          Δημιουργία
+                          </a>
+                        </li>
+                    </ul>
+                  </li>
+                {% endif %}
+                {% if show_transfer_menu%}
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" 
+                      href="#" 
+                      id="navbarDropdown" 
+                      role="button" 
+                      data-bs-toggle="dropdown" 
+                      aria-expanded="false">
+                      Μεταφορές
+                      </a>
+                    <ul class="dropdown-menu" 
+                        aria-labelledby="navbarDropdown">
+                        <li>
+                          <a class="dropdown-item" 
+                          href="{% url 'transfer_create' register_pk %}">
+                          Δημιουργία
+                          </a>
+                        </li>
+                        <li>
+                          <a class="dropdown-item" 
+                          href="{% url 'transfer_list' register_pk %}">
+                          Προβολή
+                          </a>
+                        </li>
+                    </ul>
+                  {% endif %}
                 </li>
               </ul>
               <ul class="navbar-nav ms-auto">
@@ -70,7 +99,6 @@
       </nav>
     </header>
     {% block content %}   
-
     {% endblock content %}
     </div>
   </body>

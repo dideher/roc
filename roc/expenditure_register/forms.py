@@ -1,9 +1,9 @@
 from logging import PlaceHolder
 from webbrowser import get
 from django import forms
-from django.forms import Form, ModelForm, Textarea, Select, HiddenInput, NumberInput, TextInput, CheckboxInput
+from django.forms import Form, ModelForm, Textarea, Select, HiddenInput, NumberInput, TextInput, CheckboxInput, ModelChoiceField
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
-from .models import Account, Credit, Debit, Recall, RequestForPaymentOrInvoice, Payment
+from .models import Account, Credit, Debit, Recall, RequestForPaymentOrInvoice, Payment, Transfer
 from django.utils.translation import gettext_lazy as _
 from decimal import *
 from .utils import compute_total_recall, compute_total_credit, compute_total_invoice_amount
@@ -21,6 +21,18 @@ class AccountForm(ModelForm):
         }
 
 
+class TransferForm(ModelForm):
+    # Dictionary self.initial is defined in the get_initial() method of the TransferCreateView  class.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['outgoing_account'].queryset = self.initial['outgoing_account'] 
+        self.fields['incoming_account'].queryset = self.initial['incoming_account'] 
+        
+    class Meta:
+        model = Transfer
+        fields = ['amount', 'protocol', 'date', 'diavgeia_string', 'diavgeia_date', 'outgoing_account', 'incoming_account', 'expenditure_register']
+        
+        
 class CreditForm(ModelForm):
     class Meta:
         model = Credit

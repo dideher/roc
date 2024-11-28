@@ -21,6 +21,8 @@ from django.core.exceptions import *
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 
+from django.contrib import messages
+
 from django.conf import settings
 from django.template.loader import get_template
 from weasyprint import HTML
@@ -29,7 +31,7 @@ from django.template.loader import render_to_string
 from config.settings import BASE_DIR
 
 from .models import *
-from .forms import AccountForm, CreditForm, DebitForm, RecallForm, RequestForPaymentOrInvoiceForm, PaymentForm, RecallRequestToPdfForm
+from .forms import AccountForm, CreditForm, DebitForm, RecallForm, RequestForPaymentOrInvoiceForm, PaymentForm, RecallRequestToPdfForm, TransferForm
 from .utils import *
 from decimal import *
 import calendar
@@ -56,6 +58,11 @@ class ExpenditureRegisterListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.order_by('-year')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_register_menu'] = True
+        return context
 
 
 class ExpenditureRegisterDeleteView(LoginRequiredMixin, DeleteView):
@@ -339,8 +346,10 @@ class AccountListView(LoginRequiredMixin, ListView):
         total_pending_payments = [i - p for i, p in zip(total_invoice_list, total_payment_list)]
         context['data_list'] = zip(list(context['object_list']), total_credit_list, total_debit_list, total_residual_credit_list, total_recall_list, total_invoice_list, total_amount_to_recall, total_payment_list, total_pending_debits, total_pending_payments)
         context['register'] = ExpenditureRegister.objects.get(pk = self.kwargs['register_pk'])
+        context['register_pk'] = self.kwargs['register_pk']
         context['account_selection'] = [account_category[0] for account_category in account_CATEGORIES_TYPE_CHOICES]
         context['selected_account_type'] = self.request.session.get('account_subcategory', 'ΟΛΟΙ')
+        context['show_transfer_menu'] = True
         return context
 
 
@@ -433,7 +442,10 @@ class CreditListView(LoginRequiredMixin, ListView):
     # Get the set of exit accounts for a specific expenditure register.
     def get_queryset(self):
         # queryset = super().get_queryset()
-        queryset = Credit.objects.filter(account = self.kwargs['account_pk'])
+        print( self.kwargs['account_pk'])
+        account = Account.objects.get(id = self.kwargs['account_pk'])
+        queryset = Credit.objects.filter(account = account)
+        print(queryset)
         return queryset
 
     # Add to context the data of the Account so that the user can see the register book it works on.
@@ -461,7 +473,23 @@ class CreditDeleteView(LoginRequiredMixin, DeleteView):
         return context
   
     # @transaction.atomic
-    # def form_valid(self, form, **kwargs):
+    def form_valid(self, form):
+        transfer_queryset = Transfer.objects.filter(id = self.object.transfer.id)
+        if transfer_queryset.exists():
+            messages.error(self.request, f"Η πίστωση που επιθυμείτε να διαγράψετε προέρχεται από μεταφορά. \
+                           Η συγκεκριμένη πίστωση διαγράφεται αυτόματα όταν διαγραφεί η μεταφορά από την οποία προήλθε.")
+            register = ExpenditureRegister.objects.get(id = self.kwargs['register_pk'])
+            account = Account.objects.get(id = self.kwargs['account_pk'])
+            object_list = Credit.objects.filter(account = account)
+            response = render(self.request, template_name="expenditure_register/credit_list.html", context={"register_pk": self.kwargs['register_pk'],
+                                                                                                            'account_pk': self.kwargs['account_pk'],
+                                                                                                            'register': register,
+                                                                                                            'account': account,
+                                                                                                            'object_list': object_list,
+                                                                                                            'show_transfer_menu' : True,})        
+        else:
+            response = super().form_valid(form)
+        return response
     #     credit = Credit.objects.get(pk = self.kwargs['pk'])
     #     account = Account.objects.get(pk = self.kwargs['account_pk'])
     #     account.balance = account.balance - credit.credit*credit.disposed_percentage/Decimal(100.00)
@@ -989,6 +1017,114 @@ class PaymentUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self) -> str:
         return reverse_lazy('payment_list', args = (self.kwargs['register_pk'], self.kwargs['account_pk'], self.kwargs['debit_pk'], self.kwargs['invoice_pk']))
+
+
+class TransferCreateView(LoginRequiredMixin, CreateView):
+    model = Transfer
+    form_class = TransferForm
+    
+    @transaction.atomic
+    def form_valid(self, form):
+        # form_valid() is called when form data are valid. 
+        # So I accessing them is relatively safe.
+        transfer_amount = form.cleaned_data['amount']
+        outgoing_account = form.cleaned_data['outgoing_account']
+        total_recall = compute_total_recall(outgoing_account.id)
+        account = Account.objects.get(pk = outgoing_account.id)
+        # Get the total amount of credit (negative) that has been transfered from outgoing_account to any other account. 
+        # Use -1 to make it a possitive value.
+        # If there are no credits in transfer we get back None.
+        account_credit_in_transfer = -Credit.objects.filter(account=account, transfer__isnull=False).aggregate(Sum('credit'))['credit__sum']
+        if account_credit_in_transfer == None:
+            account_credit_in_transfer = Decimal(0.0)
+
+        # total_debit = compute_total_debit(outgoing_account.id)
+        if transfer_amount + account_credit_in_transfer >= total_recall + Decimal(0.1) :
+            # Reload the form with an error message.
+            messages.error(self.request, f"Δεν υπάρχει στο λογαριασμό εξόδου αδέσμευτη πίστωση ποσού {transfer_amount} για μεταφορά.")
+            response = render(self.request, template_name="expenditure_register/transfer_form.html", context={"register_pk": self.kwargs['register_pk'], 
+                                                                                                              'form': form,
+                                                                                                              'show_transfer_menu' : True,})
+        else:
+            # Create the transfer object and two credit objects in as a single transaction.
+            response = super().form_valid(form)
+            transfer = self.object #Transfer.objects.get(id = self.pk)
+            transfer_from_credit = Credit(
+                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[2][0],
+                credit =  -transfer.amount,
+                disposed_percentage = 100,
+                date_of_disposal = transfer.date,
+                account = transfer.outgoing_account,
+                transfer = transfer,
+            )
+            transfer_from_credit.save()
+            transfer_to_credit = Credit(
+                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[3][0],
+                credit =  transfer.amount,
+                disposed_percentage = 100,
+                date_of_disposal = transfer.date,
+                account = transfer.incoming_account,
+                transfer = transfer,
+            )
+            transfer_to_credit.save()
+        return  response
+
+    def get_initial(self, *args, **kwargs):
+        # initial = super().get_initial(**kwargs)
+        initial = dict()
+        initial['expenditure_register'] = ExpenditureRegister.objects.get(id = self.kwargs['register_pk'])
+        initial['amount'] = 0
+        initial['protocol'] = ""
+        initial['date'] = date.today()
+        initial['diavgeia_string'] = ""
+        initial['diavgeia_date'] = date.today()
+        initial['outgoing_account'] = Account.objects.filter(expenditure_register = self.kwargs['register_pk'])
+        initial['incoming_account'] = Account.objects.filter(expenditure_register = self.kwargs['register_pk'])
+        return initial
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['register_pk'] = self.kwargs['register_pk']
+        context['show_transfer_menu'] = True
+        return context
+    
+           
+    def get_success_url(self):
+        return reverse_lazy('transfer_list', args = (self.kwargs['register_pk'],))
+
+
+
+class TransferListView(LoginRequiredMixin, ListView):
+    model = Transfer
+    
+    # Get the set of exit accounts for a specific expenditure register.
+    def get_queryset(self, ):
+        queryset = super().get_queryset()
+        queryset = Transfer.objects.filter(expenditure_register = self.kwargs['register_pk'])
+        return queryset
+
+    # Add to context the data of the Expediture Register so that the user can see the register book it works on.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['register_pk'] = self.kwargs['register_pk']
+        context['show_transfer_menu'] = True
+        return context
+
+
+class TransferDeleteView(LoginRequiredMixin, DeleteView):
+    model = Transfer
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['register'] = ExpenditureRegister.objects.get(pk = self.kwargs['register_pk'])
+        context['register_pk'] = self.kwargs['register_pk']
+        return context
+  
+    # template_name = 'expenditureregister_confirm_delete.html'
+    def get_success_url(self) -> str:
+        return reverse_lazy('transfer_list', args = (self.kwargs['register_pk'],))
+
 
 
 def index(request):

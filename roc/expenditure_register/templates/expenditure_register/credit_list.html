@@ -2,7 +2,20 @@
 {% extends 'expenditure_register/base.html' %}
 
 {% block content %}    
-<br>
+{% if messages %}
+    <ul class="messages" style="list-style-type:none;">
+        {% for message in messages %}
+            <li {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}
+                    <div class="alert alert-warning" role="alert">{{ message }}</div>
+                {% endif %}
+                {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+                    <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 <fieldset> 
     <legend style="text-align: center"> Στοιχεία ΑΛΕ </legend>
     <table class="table table-light table-striped">
