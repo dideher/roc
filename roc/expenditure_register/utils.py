@@ -43,20 +43,62 @@ def compute_reformed_credit(account_pk, reference_date=None):
         reference_date = datetime.datetime.today()
 
     account = Account.objects.get(pk = account_pk)
-    account_initial_credit = Decimal(0.0)
+    account_reformed_credit = Decimal(0.0)
     try:
-        account_initial_credit = Credit.objects.filter(account=account).filter(date_of_disposal__lte = reference_date).filter(credit_reform='ΑΝΑΜΟΡΦΩΣΗ').aggregate(Sum('credit'))['credit__sum']
+        account_reformed_credit = Credit.objects.filter(account=account).filter(date_of_disposal__lte = reference_date).filter(credit_reform='ΑΝΑΜΟΡΦΩΣΗ').aggregate(Sum('credit'))['credit__sum']
     except (MultipleObjectsReturned, ObjectDoesNotExist):
         pass
 
     # print(reference_date, account_initial_credit)
-    if account_initial_credit is None:
-        account_initial_credit = Decimal(0.0)
+    if account_reformed_credit is None:
+        account_reformed_credit = Decimal(0.0)
     else:
-        account_initial_credit = Decimal(account_initial_credit)
+        account_reformed_credit = Decimal(account_reformed_credit)
     
     # print(account_initial_credit)
-    return  account_initial_credit
+    return  account_reformed_credit
+
+
+def compute_outgoing_by_transfer_credit(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
+    account = Account.objects.get(pk = account_pk)
+    account_outgoing_by_transfer_credit = Decimal(0.0)
+    try:
+        account_outgoing_by_transfer_credit = Transfer.objects.filter(outgoing_account=account).filter(date__lte = reference_date).aggregate(Sum('amount'))['amount__sum']
+    except (MultipleObjectsReturned, ObjectDoesNotExist):
+        pass
+
+    # print(reference_date, account_initial_credit)
+    if account_outgoing_by_transfer_credit is None:
+        account_outgoing_by_transfer_credit = Decimal(0.0)
+    else:
+        account_outgoing_by_transfer_credit = Decimal(account_outgoing_by_transfer_credit)
+    
+    # print(account_initial_credit)
+    return  account_outgoing_by_transfer_credit
+
+
+def compute_incoming_by_transfer_credit(account_pk, reference_date=None):
+    if reference_date == None:
+        reference_date = datetime.datetime.today()
+
+    account = Account.objects.get(pk = account_pk)
+    account_incoming_by_transfer_credit = Decimal(0.0)
+    try:
+        account_incoming_by_transfer_credit = Transfer.objects.filter(incoming_account=account).filter(date__lte = reference_date).aggregate(Sum('amount'))['amount__sum']
+    except (MultipleObjectsReturned, ObjectDoesNotExist):
+        pass
+
+    # print(reference_date, account_initial_credit)
+    if account_incoming_by_transfer_credit is None:
+        account_incoming_by_transfer_credit = Decimal(0.0)
+    else:
+        account_incoming_by_transfer_credit = Decimal(account_incoming_by_transfer_credit)
+    
+    # print(account_initial_credit)
+    return  account_incoming_by_transfer_credit
 
 
 def compute_disposed_percentage(account_pk, reference_date=None):
@@ -251,9 +293,9 @@ def compute_report_data(register_pk, reference_date=None):
     # print(type(reformed_credit_list[0]))
     total_credit_list = [i_c + r_c for i_c, r_c in zip(initial_credit_list, reformed_credit_list)]
     disposed_percentage_list = [compute_disposed_percentage(account.pk, reference_date) for account in accounts]
-    total_debit_list = [compute_total_debit(account.pk, reference_date) for account in accounts]
-    total_residual_credit_list = [c*p/Decimal(100.0) - d for c, p, d in zip(total_credit_list, disposed_percentage_list, total_debit_list)] 
     total_recall_list = [compute_total_recall(account.pk, reference_date) for account in accounts]
+    total_debit_list = [max(compute_total_debit(account.pk, reference_date) - total_recall, Decimal(0.0)) for account, total_recall in zip(accounts, total_recall_list)]
+    total_residual_credit_list = [max(c*p/Decimal(100.0) - d, Decimal(0.0)) for c, p, d in zip(total_credit_list, disposed_percentage_list, total_debit_list)]
     total_invoice_list = [compute_total_invoice_amount(account.pk, reference_date) for account in accounts]
     total_payment_list = [compute_total_payment_amount(account.pk, reference_date) for account in accounts]
     total_90days_delayed_payment_to_third_parties_list = [compute_total_90days_delayed_payment_to_third_parties_list(account.pk) for account in accounts]

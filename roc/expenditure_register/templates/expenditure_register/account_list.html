@@ -40,14 +40,26 @@ function create_chart(chart_name, data, myTitle) {
     const myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: ['Πιστώσεις', 'Δεσμεύσεις', 'Τιμολόγια', 'Πληρωμές', 'Απλήρωτες υποχρεώσεις', 'Εκκρεμείς Δεσμεύσεις', 'Διαθέσιμη Πίστωση', 'Ανακλήσεις', 'Ανακλήσιμα'],
+        labels: ['Πιστώσεις', 
+                 'Δεσμεύσεις', 
+                 'Εξερχόμενη Πίστωση από Μεταφορά', 
+                 'Εισερχόμενη Πίστωση από Μεταφορά ', 
+                 'Τιμολόγια', 
+                 'Πληρωμές', 
+                 'Απλήρωτες υποχρεώσεις', 
+                 'Εκκρεμείς Δεσμεύσεις', 
+                 'Διαθέσιμη Πίστωση', 
+                 'Ανακλήσεις', 
+                 'Ανακλήσιμα'],
         datasets: [{
             data: data,
-//          label:label,
+            //label:label,
             backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
             'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 205, 86, 0.2)',
+            'rgba(220,20,60, 0.2)',
+            'rgba(255,69,0, 0.2)',
+            'rgba(33, 150, 122, 0.2)',
             'rgba(75, 192, 192, 0.2)',
             'rgba(54, 162, 235, 0.2)',
             'rgba(150, 100, 255, 0.2)',
@@ -56,21 +68,24 @@ function create_chart(chart_name, data, myTitle) {
             'rgba(40, 100, 206, 0.2)'
             ],
             borderColor: [
-            'rgb(255, 99, 132)',
-            'rgb(255, 159, 64)',
-            'rgb(255, 205, 86)',
-            'rgb(75, 192, 192)',
-            'rgb(54, 162, 235)',
-            'rgb(150, 100, 255)',
-            'rgb(200, 100, 255)',
-            'rgb240, 90, 200)',
-            'rgb(40, 100, 206)'
+            'rgba(255, 99, 132)',
+            'rgba(255, 159, 64)',
+            'rgba(220,20,60)',
+            'rgba(255,69,0)',
+            'rgba(33, 150, 122)',
+            'rgba(75, 192, 192)',
+            'rgba(54, 162, 235)',
+            'rgba(150, 100, 255)',
+            'rgba(200, 100, 255)',
+            'rgba(240, 90, 255)',
+            'rgba(40, 100, 206)'
             ],
             borderWidth: 1
         }]
     },
     options: {
-        responsive: false,
+        scaleShowValues: true,
+
         indexAxis: 'y',
         layout: {
             padding: {right: 70}
@@ -78,7 +93,12 @@ function create_chart(chart_name, data, myTitle) {
         scales: {
             y: {
                 beginAtZero: true
-            }
+            },
+            xAxes: [{
+                ticks: {
+                  autoSkip: false
+                }
+              }]
         },
         labels: {
             font: {
@@ -164,7 +184,7 @@ function create_chart(chart_name, data, myTitle) {
             </tr>
         </thead>
         <tbody>
-            {% for account, total_credit, total_debit, total_residual_credit_list, total_recall, total_invoice, total_amount_to_recall, total_payment, total_pending_debits, total_pending_payments in data_list %}
+            {% for account, total_credit, total_debit, total_outgoing_by_transfer_list, total_incoming_by_transfer_list, total_residual_credit_list, total_recall, total_invoice, total_amount_to_recall, total_payment, total_pending_debits, total_pending_payments in data_list %}
             <tr>
                 {% comment %} <td> {{ forloop.counter }} </td> {% endcomment %}
                 {% comment %} <td style="text-align: right"> {{ account.number }} </td> {% endcomment %}
@@ -185,7 +205,7 @@ function create_chart(chart_name, data, myTitle) {
                     </td>
                 <script>
                     var chart_name = 'myChart_';
-                    var data = [{{ total_credit | safe}}, {{ total_debit | safe}}, {{ total_invoice | safe}}, {{ total_payment  | safe}}, {{ total_pending_payments | safe}}, {{total_pending_debits | safe }}, {{ total_residual_credit_list | safe}}, {{ total_recall  | safe}}, {{ total_amount_to_recall | safe}}];
+                    var data = [{{ total_credit | safe}}, {{ total_debit | safe}}, {{ total_outgoing_by_transfer_list | safe}}, {{ total_incoming_by_transfer_list | safe}}, {{ total_invoice | safe}}, {{ total_payment  | safe}}, {{ total_pending_payments | safe}}, {{total_pending_debits | safe }}, {{ total_residual_credit_list | safe}}, {{ total_recall  | safe}}, {{ total_amount_to_recall | safe}}];
 //                  var label = [String({{ account.number | safe }})];
                     var title = '{{ account.subcategory | safe }} ({{ account.number | safe }})' //[String({{ account.subcategory | safe }})];
                     create_chart(chart_name.concat({{ forloop.counter | safe }}), data, title );

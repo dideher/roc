@@ -2,6 +2,7 @@
 {% extends 'expenditure_register/base.html' %}
 
 {% block content %}    
+
 <fieldset> 
     <legend style="text-align: center"> Μεταφορές </legend> 
     <table class="table table-light table-striped table-sm">
@@ -43,4 +44,10 @@
         </tbody>
     </table>
 </fieldset>
+
+<fieldset>
+<a href="{% url 'account_list' register_pk %}" class="btn btn-secondary"> Επιστροφή </a>
+<a href="{% url 'transfer_create' register_pk %}" class="btn btn-primary"> Δημιουργία </a>
+</fieldset>
+
 {% endblock content %}

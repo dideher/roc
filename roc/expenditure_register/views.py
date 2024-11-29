@@ -139,7 +139,7 @@ class RegisterReportToXlsxView(LoginRequiredMixin, View):
         # Formatting rows, columns and cells of the spreadsheet.
         ws.page_setup.fitToHeight = 0
         ws.page_setup.fitToWidth = 1
-        ws.append(('Έτος (4)','Περίοδος (3)','Κατηγορία Π/Υ (3)','Φορέας (2)','Ειδικός Φορέας','ΑΛΕ (4)','(4) Εγκεκριμένη Πίστωση Π/Υ (5)','(5) Αναμόρφωση Π/Υ (+/-)','(6) Διαμόρφωση Π/Υ = (4)+(5)','(7) Ποσοστό Διάθεσης Πιστώσεων','(11) Ανειλλημμένη Δέσμευση (Ποσό Δέσμευσης)','(12) Υπολειπόμενη προς Διάθεση πίστωση (12)=(6)*(7)-(11)','(22) Ποσό τιμολογίου ή άλλου ισοδύναμου εγγράφου','(36) Συνολικό Ποσό πληρωμής','(37) Συνολικό ποσό πληρωμής Ληξ. Οφειλ > 90 προς Τρίτους','(38) Εκ του οποίου συμψηφ./παρακρ. Υπέρ του Δημοσ. ή ΟΚΑ','(39) Εκκρεμείς Δεσμεύσεις (39)=(11)-(36)','(40) Σύνολο Απλήρωτων Υποχρεώσεων (40)=(22)-(36)','(41) Απλήρωτες Υποχρεώσεις προς Γενική Κυβέρνηση','(42) Απλήρωτες Υποχρεώσεις προς Τρίτους','(43) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 1 - 30 ημ','(44) Εκκρεμείς Οφειλές προς Τρίτους 1 - 30 ημ','(45) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 31 - 60 ημ','(46) Εκκρεμείς Οφειλές προς Τρίτους 31 - 60 ημ','(47) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 61 - 90 ημ','(48) Εκκρεμείς Οφειλές προς Τρίτους 61 - 90 ημ','(49) Ληξιπρόθεσμες Οφειλές προς Γεν. Κυβέρνηση> 90 ημ','(50) Ληξιπρόθεσμες Οφειλές προς Τρίτους > 90 ημ','(51) Ληξιπρόθεσμες Οφειλές προς Τρίτους μη εγχ. Πιστωτές > 90 ημ'))
+        ws.append(('Έτος (4)','Περίοδος (3)','Κατηγορία Π/Υ (3)','Φορέας (2)','Ειδικός Φορέας','ΑΛΕ (4)','(4) Εγκεκριμένη Πίστωση Π/Υ','(5) Αναμόρφωση Π/Υ (+/-)','(6) Διαμόρφωση Π/Υ = (4)+(5)','(7) Ποσοστό Διάθεσης Πιστώσεων','(11) Ανειλλημμένη Δέσμευση (Ποσό Δέσμευσης)','(12) Υπολειπόμενη προς Διάθεση πίστωση (12)=(6)*(7)-(11)','(22) Ποσό τιμολογίου ή άλλου ισοδύναμου εγγράφου','(36) Συνολικό Ποσό πληρωμής','(37) Συνολικό ποσό πληρωμής Ληξ. Οφειλ > 90 προς Τρίτους','(38) Εκ του οποίου συμψηφ./παρακρ. Υπέρ του Δημοσ. ή ΟΚΑ','(39) Εκκρεμείς Δεσμεύσεις (39)=(11)-(36)','(40) Σύνολο Απλήρωτων Υποχρεώσεων (40)=(22)-(36)','(41) Απλήρωτες Υποχρεώσεις προς Γενική Κυβέρνηση','(42) Απλήρωτες Υποχρεώσεις προς Τρίτους','(43) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 1 - 30 ημ','(44) Εκκρεμείς Οφειλές προς Τρίτους 1 - 30 ημ','(45) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 31 - 60 ημ','(46) Εκκρεμείς Οφειλές προς Τρίτους 31 - 60 ημ','(47) Εκκρεμείς Οφειλές προς Γενική Κυβέρνηση 61 - 90 ημ','(48) Εκκρεμείς Οφειλές προς Τρίτους 61 - 90 ημ','(49) Ληξιπρόθεσμες Οφειλές προς Γεν. Κυβέρνηση> 90 ημ','(50) Ληξιπρόθεσμες Οφειλές προς Τρίτους > 90 ημ','(51) Ληξιπρόθεσμες Οφειλές προς Τρίτους μη εγχ. Πιστωτές > 90 ημ'))
         ws.row_dimensions[1].height = 65
         for col in range(1,30):
             column_letter = utils.cell.get_column_letter(col)
@@ -336,15 +336,29 @@ class AccountListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         # balance_list = [get_account_balance(account.pk) for account in context['object_list']]
         total_credit_list = [compute_total_credit(account.pk) for account in context['object_list']]
-        total_debit_list = [compute_total_debit(account.pk) for account in context['object_list']]
-        total_residual_credit_list = [c - d for c, d in zip(total_credit_list, total_debit_list)] 
+        total_outgoing_by_transfer_list = [compute_outgoing_by_transfer_credit(account.pk) for account in context['object_list']]
+        total_incoming_by_transfer_list = [compute_incoming_by_transfer_credit(account.pk) for account in context['object_list']]
         total_recall_list = [compute_total_recall(account.pk) for account in context['object_list']]
+        total_debit_list = [max(compute_total_debit(account.pk) - total_recall, Decimal(0.0)) for account, total_recall in zip( context['object_list'], total_recall_list)]
+        # total_debit_list = [compute_total_debit(account.pk)  for account in context['object_list']]
+        total_residual_credit_list = [max(c - d, Decimal(0.0)) for c, d in zip(total_credit_list, total_debit_list)] 
         total_invoice_list = [compute_total_invoice_amount(account.pk) for account in context['object_list']]
         total_amount_to_recall = [c - i - r for c, i, r in zip(total_credit_list, total_invoice_list, total_recall_list)] 
         total_payment_list = [compute_total_payment_amount(account.pk) for account in context['object_list']]
         total_pending_debits = [d - p for d, p in zip(total_debit_list, total_payment_list)]
         total_pending_payments = [i - p for i, p in zip(total_invoice_list, total_payment_list)]
-        context['data_list'] = zip(list(context['object_list']), total_credit_list, total_debit_list, total_residual_credit_list, total_recall_list, total_invoice_list, total_amount_to_recall, total_payment_list, total_pending_debits, total_pending_payments)
+        context['data_list'] = zip(list(context['object_list']), 
+                                   total_credit_list, 
+                                   total_debit_list, 
+                                   total_outgoing_by_transfer_list,
+                                   total_incoming_by_transfer_list,
+                                   total_residual_credit_list, 
+                                   total_recall_list, 
+                                   total_invoice_list, 
+                                   total_amount_to_recall, 
+                                   total_payment_list, 
+                                   total_pending_debits, 
+                                   total_pending_payments)
         context['register'] = ExpenditureRegister.objects.get(pk = self.kwargs['register_pk'])
         context['register_pk'] = self.kwargs['register_pk']
         context['account_selection'] = [account_category[0] for account_category in account_CATEGORIES_TYPE_CHOICES]
@@ -474,19 +488,20 @@ class CreditDeleteView(LoginRequiredMixin, DeleteView):
   
     # @transaction.atomic
     def form_valid(self, form):
-        transfer_queryset = Transfer.objects.filter(id = self.object.transfer.id)
-        if transfer_queryset.exists():
-            messages.error(self.request, f"Η πίστωση που επιθυμείτε να διαγράψετε προέρχεται από μεταφορά. \
-                           Η συγκεκριμένη πίστωση διαγράφεται αυτόματα όταν διαγραφεί η μεταφορά από την οποία προήλθε.")
-            register = ExpenditureRegister.objects.get(id = self.kwargs['register_pk'])
-            account = Account.objects.get(id = self.kwargs['account_pk'])
-            object_list = Credit.objects.filter(account = account)
-            response = render(self.request, template_name="expenditure_register/credit_list.html", context={"register_pk": self.kwargs['register_pk'],
-                                                                                                            'account_pk': self.kwargs['account_pk'],
-                                                                                                            'register': register,
-                                                                                                            'account': account,
-                                                                                                            'object_list': object_list,
-                                                                                                            'show_transfer_menu' : True,})        
+        if self.object.transfer != None:
+            transfer_queryset = Transfer.objects.filter(id = self.object.transfer.id)
+            if transfer_queryset.exists():
+                messages.error(self.request, f"Η πίστωση που επιθυμείτε να διαγράψετε προέρχεται από μεταφορά. \
+                            Η συγκεκριμένη πίστωση διαγράφεται αυτόματα όταν διαγραφεί η μεταφορά από την οποία προήλθε.")
+                register = ExpenditureRegister.objects.get(id = self.kwargs['register_pk'])
+                account = Account.objects.get(id = self.kwargs['account_pk'])
+                object_list = Credit.objects.filter(account = account)
+                response = render(self.request, template_name="expenditure_register/credit_list.html", context={"register_pk": self.kwargs['register_pk'],
+                                                                                                                'account_pk': self.kwargs['account_pk'],
+                                                                                                                'register': register,
+                                                                                                                'account': account,
+                                                                                                                'object_list': object_list,
+                                                                                                                'show_transfer_menu' : True,})        
         else:
             response = super().form_valid(form)
         return response
@@ -1034,12 +1049,14 @@ class TransferCreateView(LoginRequiredMixin, CreateView):
         # Get the total amount of credit (negative) that has been transfered from outgoing_account to any other account. 
         # Use -1 to make it a possitive value.
         # If there are no credits in transfer we get back None.
-        account_credit_in_transfer = -Credit.objects.filter(account=account, transfer__isnull=False).aggregate(Sum('credit'))['credit__sum']
-        if account_credit_in_transfer == None:
-            account_credit_in_transfer = Decimal(0.0)
+        account_credit_in_transfer = Credit.objects.filter(account=account, transfer__isnull=False)
+        if account_credit_in_transfer.exists():
+            total_account_credit_in_transfer = -1*account_credit_in_transfer.aggregate(Sum('credit'))['credit__sum']
+        else:# account_credit_in_transfer == None:
+            total_account_credit_in_transfer = Decimal(0.0)
 
         # total_debit = compute_total_debit(outgoing_account.id)
-        if transfer_amount + account_credit_in_transfer >= total_recall + Decimal(0.1) :
+        if transfer_amount + total_account_credit_in_transfer >= total_recall + Decimal(0.1) :
             # Reload the form with an error message.
             messages.error(self.request, f"Δεν υπάρχει στο λογαριασμό εξόδου αδέσμευτη πίστωση ποσού {transfer_amount} για μεταφορά.")
             response = render(self.request, template_name="expenditure_register/transfer_form.html", context={"register_pk": self.kwargs['register_pk'], 
@@ -1050,7 +1067,7 @@ class TransferCreateView(LoginRequiredMixin, CreateView):
             response = super().form_valid(form)
             transfer = self.object #Transfer.objects.get(id = self.pk)
             transfer_from_credit = Credit(
-                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[2][0],
+                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[1][0],
                 credit =  -transfer.amount,
                 disposed_percentage = 100,
                 date_of_disposal = transfer.date,
@@ -1059,7 +1076,7 @@ class TransferCreateView(LoginRequiredMixin, CreateView):
             )
             transfer_from_credit.save()
             transfer_to_credit = Credit(
-                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[3][0],
+                credit_reform = CREDIT_AUTHORIZATION_TYPE_CHOICES[1][0],
                 credit =  transfer.amount,
                 disposed_percentage = 100,
                 date_of_disposal = transfer.date,

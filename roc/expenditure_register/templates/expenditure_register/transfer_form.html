@@ -20,7 +20,7 @@
     <form method="post">
         {% csrf_token %}
         {{ form | crispy }}        
-        <a href="{% url 'account_list' register_pk %}" class="btn btn-secondary"> Ακύρωση </a>
+        <a href="{% url 'transfer_list' register_pk %}" class="btn btn-secondary"> Ακύρωση </a>
         <input type="submit" value="Αποθήκευση" class="btn btn-primary btn-md">
     </form>
 {% endblock content %}

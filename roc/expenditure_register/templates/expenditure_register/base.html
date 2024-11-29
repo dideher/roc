@@ -46,30 +46,24 @@
                   </li>
                 {% endif %}
                 {% if show_transfer_menu%}
+                <li class="nav-item dropdown">
+                  <a class="nav-link" 
+                    href="{% url 'register_list' %}" 
+                    role="button">
+                    Αρχική
+                    </a>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" 
-                      href="#" 
-                      id="navbarDropdown" 
-                      role="button" 
-                      data-bs-toggle="dropdown" 
-                      aria-expanded="false">
+                    <a class="nav-link" 
+                      href="{% url 'register_report' register_pk %}" 
+                      role="button">
+                      Αναφορά
+                      </a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link" 
+                      href="{% url 'transfer_list' register_pk %}" 
+                      role="button">
                       Μεταφορές
                       </a>
-                    <ul class="dropdown-menu" 
-                        aria-labelledby="navbarDropdown">
-                        <li>
-                          <a class="dropdown-item" 
-                          href="{% url 'transfer_create' register_pk %}">
-                          Δημιουργία
-                          </a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" 
-                          href="{% url 'transfer_list' register_pk %}">
-                          Προβολή
-                          </a>
-                        </li>
-                    </ul>
                   {% endif %}
                 </li>
               </ul>
