@@ -32,6 +32,23 @@ class TransferForm(ModelForm):
         model = Transfer
         fields = ['amount', 'protocol', 'date', 'diavgeia_string', 'diavgeia_date', 'outgoing_account', 'incoming_account', 'expenditure_register']
         
+
+class TransferUpdateForm(ModelForm):
+    # Dictionary self.initial is defined in the get_initial() method of the TransferCreateView  class.
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+        # self.fields['outgoing_account'].queryset = self.initial['outgoing_account'] 
+        # self.fields['incoming_account'].queryset = self.initial['incoming_account'] 
+        
+    class Meta:
+        model = Transfer
+        # fields = ['amount', 'protocol', 'date', 'diavgeia_string', 'diavgeia_date', 'outgoing_account', 'incoming_account', 'expenditure_register']
+        fields = '__all__'
+        widgets = {
+            'outgoing_account': HiddenInput(),
+            'incoming_account': HiddenInput(),
+            'expenditure_register': HiddenInput(),
+        }
         
 class CreditForm(ModelForm):
     class Meta:
@@ -52,8 +69,10 @@ class CreditForm(ModelForm):
         initial_total_debit = self.initial['total_debit']
         credit = cleaned_data.get('credit')
         date = cleaned_data.get('date_of_disposal')
+        transfer = cleaned_data.get('transfer')
+        if not transfer == None:
+            raise ValidationError(_('Η πίστωση που επιθυμείτε να τροποποιήσετε προέρχεται από μεταφορά. Προκειμένου να τροποποιήσετε την πίστωση αυτή μεταβείτε στο μενού «Μεταφορές»'))
         # print(f'{initial_total_credit} {credit} {initial_credit} {initial_total_debit}')
-
         # if not self.instance.pk:
         #     total_amount_to_recall = total_credit - total_invoice - total_recall
         # else:

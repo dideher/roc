@@ -42,5 +42,5 @@ urlpatterns = [
     path('transfer/<int:register_pk>/create', TransferCreateView.as_view(), name = 'transfer_create'),
     path('transfer/<int:register_pk>/list', TransferListView.as_view(), name = 'transfer_list'),
     path('transfer/<int:register_pk>/<int:pk>/delete', TransferDeleteView.as_view(), name = 'transfer_delete'),
-
+    path('transfer/<int:register_pk>/<int:pk>/update', TransferUpdateView.as_view(), name = 'transfer_update'),
 ]

@@ -24,6 +24,13 @@
           {% if user.is_authenticated %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav me-auto">
+                <li class="nav-item dropdown">
+                  <a class="nav-link" 
+                    href="{% url 'register_list' %}" 
+                    role="button">
+                    Αρχική
+                    </a>
+                  </li>
                 {% if show_register_menu %}
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" 
@@ -46,26 +53,30 @@
                   </li>
                 {% endif %}
                 {% if show_transfer_menu%}
-                <li class="nav-item dropdown">
-                  <a class="nav-link" 
-                    href="{% url 'register_list' %}" 
-                    role="button">
-                    Αρχική
-                    </a>
                   <li class="nav-item dropdown">
                     <a class="nav-link" 
                       href="{% url 'register_report' register_pk %}" 
                       role="button">
                       Αναφορά
                       </a>
+                    </li>
                   <li class="nav-item dropdown">
                     <a class="nav-link" 
                       href="{% url 'transfer_list' register_pk %}" 
                       role="button">
                       Μεταφορές
                       </a>
+                  </li>
                   {% endif %}
-                </li>
+                  {% if  register_report_view %}
+                    <li class="nav-item dropdown">
+                      <a class="nav-link" 
+                        href="{% url 'account_list' register_pk %}" 
+                        role="button">
+                        Μητρώο
+                        </a>
+                    </li>
+                  {% endif %}
               </ul>
               <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
