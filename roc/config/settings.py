@@ -47,9 +47,9 @@ if DEVELOPMENT:
 else:
     DEBUG = False
     # SECURITY WARNING: don't run with debug turned on in production!
-    ALLOWED_HOSTS = ['roc.dide.ira.net']
+    ALLOWED_HOSTS = ['roc.dide.ira.net', 'roc.dideira.gr']
     # CSRF_COOKIE_SECURE = False
-    CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net']
+    CSRF_TRUSTED_ORIGINS = ['http://roc.dide.ira.net', 'https://roc.dideira.gr', 'https://roc.dideira.gr']
 
 # Database
 DATABASES = {
