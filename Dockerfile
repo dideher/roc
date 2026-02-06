@@ -25,15 +25,13 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 ## install requirements
 RUN pip install --upgrade pip wheel pip-tools
 
-COPY requirements.txt ./requirements.in
+COPY requirements.txt ./requirements.txt
 
 ## update requirements file with deployment requirement deps
-RUN echo "gunicorn" >> /requirements.in
-RUN echo "mysqlclient" >> /requirements.in
+RUN echo "gunicorn" >> /requirements.txt
+RUN echo "mysqlclient" >> /requirements.txt
 
-RUN pip-compile ./requirements.in > ./requirements.txt \
-    && pip-sync \
-    && pip install -r ./requirements.txt
+RUN pip install -r ./requirements.txt
 
 ## copy Python dependencies from build image
 # COPY --from=compile-image /opt/venv /opt/venv
